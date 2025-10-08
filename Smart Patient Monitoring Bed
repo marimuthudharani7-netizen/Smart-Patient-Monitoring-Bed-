@@ -1,0 +1,34 @@
+DISCRIPTION : The Smart Patient Monitoring Bed tracks a patient’s temperature, heart rate, and bed position in real time using sensors.
+If the patient’s condition changes (e.g., fever, abnormal heart rate, or movement), the NodeMCU (ESP8266) sends data and alerts to the Blynk App through Wi-Fi — helping doctors and caretakers monitor remotely.
+CODING :
+#define BLYNK_AUTH_TOKEN "YourAuthToken"
+#include <ESP8266WiFi.h>
+#include <BlynkSimpleEsp8266.h>
+
+char auth[] = BLYNK_AUTH_TOKEN;
+char ssid[] = "YourWiFi";
+char pass[] = "YourPassword";
+
+#define tempPin A0     // Temperature sensor
+#define bedPin D1      // Bed position sensor (IR/Ultrasonic)
+#define heartPin D2    // Heartbeat sensor
+
+void setup() {
+  Serial.begin(115200);
+  Blynk.begin(auth, ssid, pass);
+  pinMode(bedPin, INPUT);
+  pinMode(heartPin, INPUT);
+}
+
+void loop() {
+  Blynk.run();
+  float temp = analogRead(tempPin) * 0.322; // LM35 conversion
+  int bed = digitalRead(bedPin);
+  int heart = digitalRead(heartPin);
+
+  Blynk.virtualWrite(V1, temp);
+  Blynk.virtualWrite(V2, heart);
+  Blynk.virtualWrite(V3, bed);
+
+  delay(1000);
+}
